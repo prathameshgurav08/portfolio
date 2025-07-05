@@ -1,20 +1,13 @@
-from flask import Flask, render_template,request,jsonify
-import json
-import os
+from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
-DATA_FILE = 'form_submissions.json'
-# Load existing data if file exists
-if os.path.exists(DATA_FILE):
-    with open(DATA_FILE, 'r') as f:
-        submissions = json.load(f)
-else:
-    submissions = []
+
+# Store submissions in memory (won't persist if server restarts)
+submissions = []
 
 @app.route("/")
 def home():
-    return render_template("index.html")
-
+    return render_template("index.html")  # Make sure index.html is in templates/
 
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -32,12 +25,8 @@ def submit():
 
     submissions.append(submission)
 
-    with open(DATA_FILE, 'w') as f:
-        json.dump(submissions, f, indent=4)
-
     return jsonify({"status": "success", "message": "Form submitted successfully!"})
 
 @app.route('/data', methods=['GET'])
 def get_data():
     return jsonify(submissions)
-    
